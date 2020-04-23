@@ -132,7 +132,18 @@ class Dumper
             foreach ($rows as $row) {
                 $dataMigration .= $this->indent(1) . "[\n";
                 foreach ($row as $column => $value) {
-                    $dataMigration .= "{$this->indent(2)}'$column' => '" . addslashes($value) . "',\n";
+                    if ($value === null) {
+                        $dataMigration .= "{$this->indent(2)}'$column' => null,\n";
+                    } elseif ($value === false) {
+                        $dataMigration .= "{$this->indent(2)}'$column' => false,\n";
+                    } elseif ($value === true) {
+                        $dataMigration .= "{$this->indent(2)}'$column' => true,\n";
+                    } else {
+                        // TODO porovnat addslashes vs tento replace
+                        // problem je ze json fieldy s addslashes neprechadzaju, asi to nie je validne ked uvodzovky escapneme :) - teba zistit
+
+                        $dataMigration .= "{$this->indent(2)}'$column' => '" . str_replace(["'"], ["\'"], $value) . "',\n";
+                    }
                 }
                 $dataMigration .= "{$this->indent(1)}],\n";
             }
